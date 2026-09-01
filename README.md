@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # TruthLens – AI-Generated Text Detector
 
 A production-ready academic project for detecting AI-generated text using machine learning and deep learning approaches.
@@ -903,4 +904,8 @@ KEY LIMITATION:
 **Last Updated**: 2024
 **Version**: 1.0.0
 **Status**: Production Ready
+
+=======
+# Truthlens
+TruthLens AI-Generated Text Detector
 
