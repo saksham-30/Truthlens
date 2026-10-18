@@ -131,7 +131,8 @@ class SampleDataGenerator:
         # Create DataFrame
         df = pd.DataFrame({
             'text': texts,
-            'label': labels
+            'label': labels,
+            'dataset_type': ['synthetic_demo'] * len(texts),
         })
         
         logger.info(f"✓ Generated {len(df)} samples")

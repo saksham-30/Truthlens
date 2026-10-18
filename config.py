@@ -21,10 +21,10 @@ DEVICE = "cuda"  # or "cpu" for CPU-only mode
 # Minimum character length for text samples
 MIN_TEXT_LENGTH = 10
 
-# Stratified split ratios
-TRAIN_RATIO = 0.70
-VAL_RATIO = 0.15
-TEST_RATIO = 0.15
+# Group-stratified split ratios (five folds, preserving source/template groups)
+TRAIN_RATIO = 0.60
+VAL_RATIO = 0.20
+TEST_RATIO = 0.20
 
 # Sample data generator settings
 SAMPLE_DATA_GENERATION = {
@@ -188,10 +188,10 @@ For deployment, consider:
    - DistilBERT GPU: ~50-100ms
    - DistilBERT CPU: ~500-1000ms
 
-5. Accuracy:
-   - Expected: 85-91% depending on dataset
-   - Validate on domain-specific text
-   - Monitor for distribution shift
+5. Evaluation:
+    - Synthetic demonstration data does not establish real-world accuracy
+    - Validate on source-disjoint, domain-specific text before making performance claims
+    - Monitor for distribution shift
 """
 
 if __name__ == "__main__":

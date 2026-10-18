@@ -23,6 +23,12 @@ from pathlib import Path
 from typing import Dict, Tuple
 from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, confusion_matrix
 
+from src.data_preprocessing import (
+    preprocess_text,
+    validate_split_integrity,
+    write_training_manifest,
+)
+
 from transformers import (
     AutoTokenizer,
     AutoModelForSequenceClassification,
@@ -184,6 +190,7 @@ def train_distilbert_model(
     # Load data
     logger.info("\nLoading data...")
     train_df, val_df, test_df = load_data_for_transformers(train_csv, val_csv, test_csv)
+    validate_split_integrity(train_df, val_df, test_df)
     
     # Load tokenizer and model
     logger.info(f"\nLoading {MODEL_NAME} tokenizer and model...")
@@ -263,6 +270,11 @@ def train_distilbert_model(
     os.makedirs(f"{MODELS_DIR}/distilbert", exist_ok=True)
     model.save_pretrained(f"{MODELS_DIR}/distilbert")
     tokenizer.save_pretrained(f"{MODELS_DIR}/distilbert")
+    write_training_manifest(
+        train_csv,
+        f"{MODELS_DIR}/distilbert/training_manifest.json",
+        'distilbert',
+    )
     logger.info(f"✓ Model saved to {MODELS_DIR}/distilbert")
     
     return {
@@ -300,29 +312,27 @@ def load_distilbert_model(model_dir: str = f"{MODELS_DIR}/distilbert"):
 def predict_distilbert(text: str, model, tokenizer, device: str = DEVICE) -> Dict:
     """
     Make prediction using DistilBERT model.
-    
-    Args:
-        text: Input text to classify    
-        model: Trained DistilBERT model
-        tokenizer: DistilBERT tokenizer
-        device: Device to run inference on
-    
-    Returns:
-        Dictionary with prediction and probabilities
+
+    Input text is normalized with the same preprocessing used during training so
+    the inference pathway matches the saved model's data assumptions.
     """
+    cleaned_text = preprocess_text(text)
+    if not cleaned_text:
+        raise ValueError("Text is empty after preprocessing.")
+
     model.to(device)
     model.eval()
-    
-    inputs = tokenizer(text, return_tensors='pt', padding=True, truncation=True, max_length=512)
+
+    inputs = tokenizer(cleaned_text, return_tensors='pt', padding=True, truncation=True, max_length=512)
     inputs = {k: v.to(device) for k, v in inputs.items()}
-    
+
     with torch.no_grad():
         outputs = model(**inputs)
-    
+
     logits = outputs.logits
     proba = torch.softmax(logits, dim=1)[0].cpu().numpy()
     pred = np.argmax(proba)
-    
+
     return {
         'prediction': int(pred),
         'human_prob': float(proba[0]),

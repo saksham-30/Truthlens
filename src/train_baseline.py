@@ -23,6 +23,8 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 from typing import Tuple, Dict
 import warnings
 
+from src.data_preprocessing import preprocess_text, validate_split_integrity, write_training_manifest
+
 warnings.filterwarnings('ignore')
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -58,6 +60,7 @@ def train_baseline_model(
     train_df = pd.read_csv(train_csv)
     val_df = pd.read_csv(val_csv)
     test_df = pd.read_csv(test_csv)
+    validate_split_integrity(train_df, val_df, test_df)
     
     logger.info(f"Train samples: {len(train_df)}")
     logger.info(f"Validation samples: {len(val_df)}")
@@ -137,6 +140,7 @@ def train_baseline_model(
     with open(model_path, 'wb') as f:
         pickle.dump(lr_model, f)
     logger.info(f"✓ Model saved to {model_path}")
+    write_training_manifest(train_csv, f"{MODELS_DIR}/baseline_training_manifest.json", 'tfidf_logistic_regression')
     
     return {
         'model': lr_model,
@@ -213,7 +217,11 @@ def predict_baseline(text: str, vectorizer, model) -> Dict:
     Returns:
         Dictionary with prediction and probability
     """
-    X = vectorizer.transform([text])
+    cleaned_text = preprocess_text(text)
+    if not cleaned_text:
+        raise ValueError("Text is empty after preprocessing.")
+
+    X = vectorizer.transform([cleaned_text])
     pred = model.predict(X)[0]
     proba = model.predict_proba(X)[0]
     

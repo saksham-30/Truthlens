@@ -104,7 +104,7 @@ TruthLens/
 
 ## 5. Dataset Format
 
-The project expects CSV files with exactly two columns:
+The preprocessing pipeline requires `text` and `label` columns. Optional source or group metadata can be included for leakage-safe splitting. The built-in demonstration generator adds a `dataset_type` column marked `synthetic_demo`.
 
 ```csv
 text,label
@@ -235,14 +235,7 @@ python src/train_baseline.py
 - Saves `models/logistic_regression.pkl` (~10 MB)
 - Prints evaluation metrics
 
-**Typical Results**:
-```
-Accuracy:  0.8450
-Precision: 0.8320
-Recall:    0.8550
-F1-Score:  0.8433
-ROC-AUC:   0.9120
-```
+**Performance caveat**: The bundled synthetic demonstration data does not establish real-world accuracy; consult only source-disjoint evaluations for dataset-specific diagnostics.
 
 ### Training DistilBERT Model
 
@@ -260,14 +253,7 @@ python src/train_distilbert.py
 - Saves checkpoint directory with best model
 - Prints evaluation metrics
 
-**Typical Results**:
-```
-Accuracy:  0.8920
-Precision: 0.8850
-Recall:    0.8990
-F1-Score:  0.8920
-ROC-AUC:   0.9580
-```
+**Performance caveat**: The bundled synthetic demonstration data does not establish real-world accuracy; consult only source-disjoint evaluations for dataset-specific diagnostics.
 
 **Training Time**:
 - GPU (NVIDIA GTX 1080+): 5-10 minutes
@@ -390,7 +376,6 @@ Output: 0 (Human) or 1 (AI)
 ```
 
 **Advantages**:
-- ✓ Higher accuracy (~89%)
 - ✓ Context-aware through transformer architecture
 - ✓ Handles complex linguistic patterns
 - ✓ Better on longer texts
@@ -421,25 +406,9 @@ Final prediction based on mean
 
 ## 12. Results & Performance
 
-### Expected Baseline Performance (on test set)
+### Evaluation Status
 
-| Metric | Value |
-|--------|-------|
-| Accuracy | 84-86% |
-| Precision | 82-85% |
-| Recall | 84-87% |
-| F1-Score | 83-86% |
-| ROC-AUC | 90-93% |
-
-### Expected DistilBERT Performance
-
-| Metric | Value |
-|--------|-------|
-| Accuracy | 88-91% |
-| Precision | 87-90% |
-| Recall | 88-92% |
-| F1-Score | 88-91% |
-| ROC-AUC | 94-97% |
+The bundled dataset is synthetic and template-generated. Its metrics are demonstration diagnostics only and do not establish real-world accuracy or authorship detection performance. Use only group-disjoint evaluation data for performance claims.
 
 ### Important Notes
 
@@ -488,7 +457,7 @@ Final prediction based on mean
 
 Run `python src/failure_analysis.py` to see how the model handles 10 test cases across different categories.
 
-Example output:
+Illustrative output format only; these scripted examples are not an empirical test benchmark:
 ```
 Category                    Expected  Predicted  AI Prob  Correct
 Human - Professional        Human     Human      18%      ✓
@@ -502,7 +471,7 @@ AI - Very Long             AI        AI         95%      ✓
 Mixed - 50/50              AI        AI         58%      ✓
 AI - With Mistakes         AI        Human      31%      ✗
 
-Accuracy: 90%
+No held-out performance estimate is established by these scripted cases.
 ```
 
 ---
@@ -544,30 +513,9 @@ They do NOT prove authorship.
 
 ## 15. Confidence Calibration
 
-### Understanding Predictions
+### Score and Uncertainty
 
-A model output of 87% AI probability does **not** mean:
-> "There's an 87% chance this text was AI-generated"
-
-It means:
-> "The model's learned patterns match AI-generated text 87% more than human text"
-
-### Brier Score
-
-Lower is better (0.0 = perfect calibration):
-
-```
-Baseline:    Brier Score = 0.12 (well calibrated)
-DistilBERT:  Brier Score = 0.08 (better calibrated)
-```
-
-### Calibration Curve
-
-Shows actual accuracy at different probability levels:
-- **Perfect**: Predictions at 80% confidence are correct 80% of the time
-- **Reality**: Most models are slightly miscalibrated
-
-See `results/calibration_*.png` for visualization.
+Displayed probabilities are model scores, not calibrated chances of authorship. The app's fixed Inconclusive margin is a heuristic, not a validation-calibrated threshold. Calibration plots are diagnostic artifacts only; the synthetic, template-overlapping split does not validate real-world calibration.
 
 ---
 
@@ -887,9 +835,8 @@ EVALUATE:
 RUN APP:
 6. streamlit run app.py
 
-EXPECTED RESULTS:
-- Baseline Accuracy: 84-86%
-- DistilBERT Accuracy: 88-91%
+EVALUATION:
+- The bundled synthetic dataset is demonstration-only; no real-world accuracy is established
 - Training Time (GPU): 5-20 minutes
 - Inference Time: 1-100ms per sample
 

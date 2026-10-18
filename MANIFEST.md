@@ -50,7 +50,7 @@
 - [x] CSV data loading and validation
 - [x] Text preprocessing (normalization, cleaning)
 - [x] Duplicate removal
-- [x] Stratified train/val/test splitting (70/15/15)
+- [x] Deterministic group-stratified train/val/test splitting (60/20/20)
 - [x] Class balance checking
 - [x] Data leakage prevention
 
@@ -191,13 +191,13 @@ streamlit run app.py
 ## 📈 Expected Performance
 
 ### Baseline Model (TF-IDF + LR)
-- Accuracy: 84-86%
+- Performance: no real-world accuracy established by the synthetic demonstration data
 - Training: 1-2 minutes
 - Inference: 1ms per sample
 - Memory: ~100 MB
 
 ### DistilBERT Model
-- Accuracy: 88-91%
+- Performance: no real-world accuracy established by the synthetic demonstration data
 - Training: 5-20 minutes (GPU dependent)
 - Inference: 50-100ms per sample (GPU), 500ms (CPU)
 - Memory: 265 MB

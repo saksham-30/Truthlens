@@ -118,21 +118,9 @@ Then:
 # ============================================================================
 
 """
-BASELINE MODEL (TF-IDF + Logistic Regression):
-  Accuracy:  84-86%
-  Precision: 82-85%
-  Recall:    84-87%
-  F1-Score:  83-86%
-  ROC-AUC:   90-93%
-  Training:  1-2 minutes
-
-DISTILBERT MODEL:
-  Accuracy:  88-91%
-  Precision: 87-90%
-  Recall:    88-92%
-  F1-Score:  88-91%
-  ROC-AUC:   94-97%
-  Training:  5-20 minutes (GPU: 5-10, CPU: 30-60)
+The bundled synthetic dataset is for demonstrations only. No real-world
+accuracy or authorship-detection performance is established by its metrics.
+Training time depends on the machine and dataset.
 
 OUTPUT FILES:
   models/tfidf_vectorizer.pkl         (50-100 MB)
